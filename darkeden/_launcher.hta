@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Launcher DarkEden.com.br</title>
+    <HTA:APPLICATION 
+        APPLICATIONNAME="Launcher DarkEden"
+        SCROLL="no"
+        SINGLEINSTANCE="yes"
+        WINDOWSTATE="normal"
+        SHOWINTASKBAR="yes"
+        ICON="darkeden.exe"
+        SYSMENU="yes"
+        MAXIMIZEBUTTON="no"
+        MINIMIZEBUTTON="yes"
+        INNERBORDER="no"
+    >
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            width: 400px;
+            height: 500px;
+        }
+        .container {
+            background-color: #2a2a2a;
+            border: 2px solid #ff3333;
+            padding: 10px;
+            width: 380px;
+            height: 480px;
+        }
+        h1 {
+            color: #ff3333;
+            margin: 10px 0;
+            font-size: 24px;
+        }
+        .config-menu {
+            margin-top: 10px;
+        }
+        .config-item {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #ff9999;
+        }
+        select, input[type="checkbox"] {
+            width: 100%;
+            padding: 5px;
+            font-size: 14px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #ff3333;
+        }
+        input[type="checkbox"] {
+            width: auto;
+        }
+        button {
+            width: 200px;
+            margin: 20px auto 0;
+            padding: 10px;
+            background-color: #ff3333;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff6666;
+        }
+        #status {
+            margin-top: 10px;
+            color: #ff3333;
+            font-weight: bold;
+        }
+        .image-container {
+            margin-bottom: 10px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border: 0px solid #ff3333;
+        }
+    </style>
+    <script language="VBScript">
+        ' Função para obter o diretório atual do HTA
+        Function GetCurrentDirectory()
+           Dim fso, scriptPath
+           Set fso = CreateObject("Scripting.FileSystemObject")
+           scriptPath = document.location.href
+           scriptPath = Replace(scriptPath, "file:///", "")
+           scriptPath = Replace(scriptPath, "/", "\")
+           scriptPath = Replace(scriptPath, "%20", " ")
+           GetCurrentDirectory = fso.GetParentFolderName(scriptPath)
+        End Function
+
+        ' Função para verificar e criar o diretório se não existir
+        Sub EnsureDirectoryExists(path)
+            Dim fso
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            If Not fso.FolderExists(path) Then
+                fso.CreateFolder(path)
+            End If
+        End Sub
+
+        ' Função para ler o arquivo de configuração
+        Function ReadConfig(filePath)
+            On Error Resume Next
+            Dim fso, file, contents
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            
+            If fso.FileExists(filePath) Then
+                Set file = fso.OpenTextFile(filePath, 1)
+                If Err.Number = 0 Then
+                    contents = file.ReadAll()
+                    file.Close
+                    ReadConfig = contents
+                Else
+                    MsgBox "Erro ao ler o arquivo de configuração: " & Err.Description
+                    ReadConfig = ""
+                End If
+            Else
+                ReadConfig = ""
+            End If
+            On Error GoTo 0
+        End Function
+
+        ' Função para escrever no arquivo de configuração
+        Sub WriteConfig(filePath, contents)
+            On Error Resume Next
+            Dim fso, file
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            
+            ' Tenta remover o atributo somente leitura
+            If fso.FileExists(filePath) Then
+                Set file = fso.GetFile(filePath)
+                If file.Attributes And 1 Then
+                    file.Attributes = file.Attributes - 1
+                End If
+            End If
+            
+            Set file = fso.OpenTextFile(filePath, 2, True)
+            If Err.Number = 0 Then
+                file.Write contents
+                file.Close
+            Else
+                MsgBox "Erro ao escrever no arquivo de configuração: " & Err.Description
+            End If
+            On Error GoTo 0
+        End Sub
+
+        ' Função para atualizar uma configuração específica
+        Sub UpdateConfig(filePath, setting, newValue)
+            Dim config, lines, i, newConfig
+            
+            config = ReadConfig(filePath)
+            If config = "" Then
+                config = "ResolutionX: 800" & vbCrLf & "ResolutionY: 600" & vbCrLf & "FullScreen: 0"
+            End If
+            
+            lines = Split(config, vbCrLf)
+            For i = 0 To UBound(lines)
+                If InStr(lines(i), setting & ":") > 0 Then
+                    lines(i) = setting & ": " & newValue
+                End If
+            Next
+            
+            newConfig = Join(lines, vbCrLf)
+            WriteConfig filePath, newConfig
+        End Sub
+
+        ' Caminho do arquivo de configuração
+        Dim configFile
+
+        ' Função para carregar as configurações e preencher os campos
+        Sub LoadSettings
+            Dim config, lines, i, resolutionX, resolutionY, fullscreen
+            
+            config = ReadConfig(configFile)
+            If config = "" Then
+                resolutionX = "1280"
+                resolutionY = "720"
+                fullscreen = "0"
+                UpdateConfig configFile, "ResolutionX", resolutionX
+                UpdateConfig configFile, "ResolutionY", resolutionY
+                UpdateConfig configFile, "FullScreen", fullscreen
+            Else
+                lines = Split(config, vbCrLf)
+                
+                For i = 0 To UBound(lines)
+                    If InStr(lines(i), "ResolutionX:") > 0 Then
+                        resolutionX = Trim(Split(lines(i), ":")(1))
+                    End If
+                    If InStr(lines(i), "ResolutionY:") > 0 Then
+                        resolutionY = Trim(Split(lines(i), ":")(1))
+                    End If
+                    If InStr(lines(i), "FullScreen:") > 0 Then
+                        fullscreen = Trim(Split(lines(i), ":")(1))
+                    End If
+                Next
+            End If
+            
+            ' Definir a resolução
+            document.getElementById("resolution").value = resolutionX & "x" & resolutionY
+            
+            ' Definir o modo fullscreen
+            document.getElementById("fullscreen").checked = (fullscreen = "1")
+        End Sub
+
+        ' Função para salvar as configurações e iniciar o jogo
+        Sub SaveAndStartGame
+            Dim resX, resY, fullscreen, server, command
+            
+            ' Pegar a resolução
+            resX = document.getElementById("resolution").value
+            resY = Split(resX, "x")(1) ' Pega a parte Y da resolução
+            resX = Split(resX, "x")(0) ' Pega a parte X da resolução
+            
+            ' Verificar se fullscreen está marcado
+            If document.getElementById("fullscreen").checked Then
+                fullscreen = 1
+            Else
+                fullscreen = 0
+            End If
+            
+            ' Atualizar o arquivo de configuração
+            UpdateConfig configFile, "ResolutionX", resX
+            UpdateConfig configFile, "ResolutionY", resY
+            UpdateConfig configFile, "FullScreen", fullscreen
+
+            ' Selecionar o servidor
+            server = document.getElementById("server").value
+            Select Case server
+                Case "offline"
+                    command = "darkeden.exe NEWSTART Futec(192.168.0.100:9909)"
+                Case "darkeden.com.br"
+                    command = "darkeden.exe NEWSTART Futec(207.244.89.166:9909)"
+                Case "darkeden_legend"
+                    command = "dklegend.exe NEWSTART Futec(144.217.10.52:53303)"
+                Case "darkeden_test"
+                    command = "darkeden.exe NEWSTART Futec(192.168.0.130:9909)"
+            End Select
+            
+            ' Executar o jogo
+            Dim shell, currentDir
+            Set shell = CreateObject("WScript.Shell")
+            currentDir = GetCurrentDirectory()
+            shell.CurrentDirectory = currentDir
+            shell.Run command, 1, False
+            
+            ' Exibir mensagem de sucesso
+            document.getElementById("status").innerHTML = "Cresça estudando, realize trabalhando e relaxe jogando."
+        End Sub
+
+        ' Função para carregar a imagem
+        Sub LoadImage
+            Dim currentDir
+            currentDir = GetCurrentDirectory()
+            document.getElementById("gameImage").src = currentDir & "\Data\image\darkeden.png"
+        End Sub
+
+        ' Inicialização quando a janela for carregada
+        Sub Window_OnLoad
+            configFile = GetCurrentDirectory() & "\Data\Info\Resolution.inf"
+            EnsureDirectoryExists(GetCurrentDirectory() & "\Data\Info")
+            LoadImage
+            LoadSettings
+            
+            ' Definir o tamanho da janela
+            window.resizeTo 440, 570
+        End Sub
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>DarkEden Launcher</h1>
+        <div class="image-container">
+            <img id="gameImage" src="" alt="DarkEden">
+        </div>
+        <div class="config-menu">
+            <div class="config-item">
+                <label for="resolution">Resolução:</label>
+                <select id="resolution">
+                    <option value="800x600">800x600</option>
+                    <option value="1024x768">1024x768</option>
+                    <option value="1280x720">1280x720</option>
+                    <option value="1280x800">1280x800</option>
+                    <option value="1366x768">1366x768</option>
+                    <option value="1440x900">1440x900</option>
+                </select>
+            </div>
+            
+            <div class="config-item">
+                <label for="fullscreen">
+                    <input type="checkbox" id="fullscreen">
+                    Tela Cheia
+                </label>
+            </div>
+            
+            <div class="config-item">
+                <label for="server">Selecione o servidor:</label>
+                <select id="server">
+                    <option value="offline">Offline</option>
+                    <option value="darkeden.com.br">darkeden.com.br</option>
+                    <option value="darkeden_legend">darkeden_legend</option>
+                    <option value="darkeden_test">darkeden_test</option>
+                </select>
+            </div>
+            
+            <button onclick="SaveAndStartGame">Jogar</button>
+        </div>
+        <div id="status"></div>
+    </div>
+</body>
+</html>
