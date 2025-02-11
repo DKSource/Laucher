@@ -1,0 +1,447 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Update List</title>
+<HTA:APPLICATION
+    APPLICATIONNAME="UpdateGenerator"
+    SCROLL="no"
+    SINGLEINSTANCE="yes"
+    WINDOWSTATE="normal"
+    BORDER="thin"
+    BORDERSTYLE="complex"
+    INNERBORDER="no"
+    CAPTION="yes"
+    SHOWINTASKBAR="yes"
+    SYSMENUS="yes"
+    MAXIMIZEBUTTON="yes"
+    MINIMIZEBUTTON="yes"
+    NAVIGABLE="no"
+    SELECTION="no"
+    CONTEXTMENU="no"
+>
+<style>
+    body {
+        font-family: 'Gothic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #000000;
+        color: #e0e0e0;
+        text-align: center;
+        margin: 0;
+        padding: 10px;
+        width: 500px;
+        height: 700px;
+    }
+
+    .container {
+        background-color: #0a0a0a;
+        border: 2px solid #c90000;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 0 10px #c90000;
+    }
+
+    .header h2 {
+        color: #ff0000;
+        margin: 10px 0;
+        font-size: 24px;
+        text-shadow: 0 0 5px #c90000;
+    }
+
+    .input-group {
+        margin: 10px 0;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+        color: #ff9999;
+    }
+
+    .input-group input[type="text"] {
+        width: 100%;
+        padding: 5px;
+        font-size: 14px;
+        background-color: #200000;
+        color: #fff;
+        border: 1px solid #c90000;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .button {
+        width: 200px;
+        padding: 8px;
+        background-color: #200000;
+        border: 1px solid #c90000;
+        color: #ff0000;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .button:hover {
+        background-color: #40000;
+    }
+
+    .log-container {
+        background-color: #0a0a0a;
+        border: 1px solid #400000;
+        padding: 10px;
+        margin-top: 10px;
+    }
+
+    .log-header {
+        color: #ff9999;
+        font-size: 14px;
+        margin-bottom: 5px;
+        text-align: left;
+    }
+
+    .log-content {
+		width: 620px;
+        height: 150px;
+        overflow-y: auto;
+        background-color: #000000;
+        border: 1px solid #400000;
+        padding: 10px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 12px;
+        color: #ff0000;
+        text-align: left;
+	    scrollbar-face-color: #c90000;
+		scrollbar-track-color: #000000;
+		scrollbar-arrow-color: #c90000;
+		scrollbar-shadow-color: #400000;
+		scrollbar-highlight-color: #400000;
+		scrollbar-3dlight-color: #400000;
+		scrollbar-darkshadow-color: #000000;
+	}
+
+    .status-bar {
+        margin-top: 10px;
+        color: #ff0000;
+        font-size: 12px;
+        border-top: 1px solid #400000;
+        padding-top: 5px;
+    }
+
+    .progress {
+        width: 620px;
+        height: 20px;
+        background-color: #200000;
+        border: 1px solid #c90000;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        width: 0%;
+        height: 100%;
+        background-color: #c90000;
+        transition: width 0.3s;
+    }
+
+    .log-entry {
+        padding: 2px 0;
+    }
+
+    .success { color: #00ff00; }
+    .error { color: #ff0000; }
+    .warning { color: #ffff00; }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #200000;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #c90000;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #ff0000;
+    }
+	
+	.footer {
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    font-size: 10px;
+    color: #c90000;
+    text-align: right;
+	}
+
+	.footer a {
+    color: #c90000;
+    text-decoration: none;
+	}
+
+	.footer a:hover {
+    color: #ff0000;
+	}
+	
+</style>
+<script language="VBScript">
+Option Explicit
+
+Dim fso, currentVersion, logArea, objShell
+Dim totalFiles, globalHash
+
+Sub Window_OnLoad()
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set logArea = document.getElementById("logArea")
+    Set objShell = CreateObject("WScript.Shell")
+
+   ' Define o tamanho da janela
+    window.resizeTo 690, 630
+
+    currentVersion = Year(Now()) Mod 100 & _
+                    Right("0" & Month(Now()), 2) & _
+                    Right("0" & Day(Now()), 2) & ".1"
+    
+    document.getElementById("versionInput").value = currentVersion
+    UpdateStatus "Pronto para iniciar"
+    
+    totalFiles = 0
+    globalHash = ""
+End Sub
+
+Function CalculateFileMD5(filePath)
+    On Error Resume Next
+    
+    Dim tempFile, cmd, result, lines, hash
+    
+    tempFile = fso.GetSpecialFolder(2) & "\md5_" & fso.GetTempName()
+    cmd = "cmd /c certutil -hashfile """ & filePath & """ MD5 > """ & tempFile & """"
+    
+    objShell.Run cmd, 0, True
+    
+    Set lines = fso.OpenTextFile(tempFile, 1)
+    lines.SkipLine
+    hash = Trim(lines.ReadLine)
+    lines.Close
+    
+    If fso.FileExists(tempFile) Then
+        fso.DeleteFile tempFile
+    End If
+    
+    If Err.Number <> 0 Then
+        LogMessage "Erro ao calcular hash de " & filePath & ": " & Err.Description
+        CalculateFileMD5 = "ERROR_HASH"
+        Err.Clear
+    Else
+        CalculateFileMD5 = LCase(hash)
+    End If
+    
+    On Error Goto 0
+End Function
+
+Sub ProcessDirectory(dirPath, baseDir, updateList)
+    On Error Resume Next
+    
+    Dim folder, file, subFolder
+    Set folder = fso.GetFolder(dirPath)
+    
+    For Each file In folder.Files
+        Dim relativePath, hash, entry
+        
+        relativePath = Replace(file.Path, baseDir & "\", "")
+        
+        If LCase(fso.GetFileName(file.Path)) <> "update.lst" Then
+            hash = CalculateFileMD5(file.Path)
+            
+            Dim parentDir
+            parentDir = fso.GetParentFolderName(relativePath)
+            If parentDir = "" Then parentDir = "\"
+            
+            entry = "v=" & currentVersion & "|" & _
+                    "f=" & fso.GetFileName(file.Path) & "|" & _
+                    "d=" & parentDir & "|" & _
+                    "h=" & hash
+            
+            updateList.Add entry
+            totalFiles = totalFiles + 1
+            globalHash = CalculateGlobalHash(globalHash & hash)
+            
+            LogMessage "Processando: " & relativePath & " (Hash: " & hash & ")"
+            UpdateProgress 50
+        End If
+    Next
+    
+    For Each subFolder In folder.SubFolders
+        ProcessDirectory subFolder.Path, baseDir, updateList
+    Next
+    
+    If Err.Number <> 0 Then
+        LogMessage "Erro ao processar diretório " & dirPath & ": " & Err.Description
+        Err.Clear
+    End If
+    
+    On Error Goto 0
+End Sub
+
+Function CalculateGlobalHash(inputString)
+    Dim tempFile, cmd
+    
+    tempFile = fso.GetSpecialFolder(2) & "\global_md5_" & fso.GetTempName()
+    
+    With fso.CreateTextFile(tempFile, True)
+        .Write inputString
+        .Close
+    End With
+    
+    CalculateGlobalHash = CalculateFileMD5(tempFile)
+    
+    If fso.FileExists(tempFile) Then
+        fso.DeleteFile tempFile
+    End If
+End Function
+
+Sub GenerateUpdateList()
+    On Error Resume Next
+    
+    Dim baseDir, updateList
+    
+    baseDir = document.getElementById("dirInput").value
+    If Not fso.FolderExists(baseDir) Then
+        MsgBox "Diretório não encontrado!", vbExclamation
+        Exit Sub
+    End If
+    
+    currentVersion = document.getElementById("versionInput").value
+    Set updateList = CreateObject("System.Collections.ArrayList")
+    totalFiles = 0
+    globalHash = ""
+    
+    logArea.innerHTML = ""
+    UpdateStatus "Processando arquivos..."
+    UpdateProgress 0
+    
+    LogMessage "Iniciando processamento..."
+    
+    updateList.Add "# Versão geral"
+    updateList.Add currentVersion
+    updateList.Add ""
+    updateList.Add "# Lista"
+    
+    ProcessDirectory baseDir, baseDir, updateList
+    
+    updateList.Add ""
+    updateList.Add "#Informações"
+    updateList.Add "total_arquivos=" & totalFiles
+    updateList.Add "hash_global=" & globalHash
+    
+    Dim outFile, line
+    Set outFile = fso.CreateTextFile(baseDir & "\update.lst", True)
+    
+    For Each line In updateList
+        outFile.WriteLine line
+    Next
+    
+    outFile.Close
+    
+    UpdateProgress 100
+    LogMessage "Arquivo update.lst gerado com sucesso!"
+    UpdateStatus "Concluído"
+    MsgBox "Arquivo update.lst gerado com sucesso!", vbInformation
+    
+    If Err.Number <> 0 Then
+        LogMessage "Erro ao gerar arquivo: " & Err.Description
+        UpdateStatus "Erro ao gerar arquivo"
+        MsgBox "Erro ao gerar arquivo: " & Err.Description, vbCritical
+        Err.Clear
+    End If
+    
+    On Error Goto 0
+End Sub
+
+Sub BrowseFolder()
+    Dim folderDialog, selectedFolder
+    
+    Set folderDialog = CreateObject("Shell.Application").BrowseForFolder(0, "Selecione o diretório base:", 0, 0)
+    If Not folderDialog Is Nothing Then
+        selectedFolder = folderDialog.Self.Path
+        document.getElementById("dirInput").value = selectedFolder
+    End If
+End Sub
+
+Sub LogMessage(msg)
+    Dim className
+    
+    If InStr(LCase(msg), "erro") > 0 Then
+        className = "error"
+    ElseIf InStr(LCase(msg), "sucesso") > 0 Then
+        className = "success"
+    ElseIf InStr(LCase(msg), "aviso") > 0 Then
+        className = "warning"
+    Else
+        className = ""
+    End If
+    
+    logArea.innerHTML = logArea.innerHTML & "<div class='log-entry " & className & "'>" & msg & "</div>"
+    logArea.scrollTop = logArea.scrollHeight
+End Sub
+
+Sub UpdateProgress(percentage)
+    document.getElementById("progressBar").style.width = percentage & "%"
+End Sub
+
+Sub UpdateStatus(status)
+    document.getElementById("statusText").innerHTML = status
+End Sub
+</script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Update List Generator</h2>
+        </div>
+        
+        <div class="input-group">
+            <label>Versão do Update:</label>
+            <input type="text" id="versionInput" placeholder="Ex: 250204.1">
+        </div>
+        
+        <div class="input-group">
+            <label>Diretório Base:</label>
+            <input type="text" id="dirInput" placeholder="Selecione o diretório base...">
+        </div>
+        
+        <div class="button-group">
+            <button class="button secondary" onclick="Call BrowseFolder">
+                Selecionar Diretório
+            </button>
+            <button class="button primary" onclick="Call GenerateUpdateList">
+                Gerar Update List
+            </button>
+        </div>
+        
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+    
+    <div class="log-container">
+        <div class="log-header">
+            <h3>Log de Processamento</h3>
+        </div>
+        <div class="log-content" id="logArea"></div>
+        <div class="status-bar">
+            <span id="statusText">Pronto para iniciar</span>
+        </div>
+    </div>
+
+<div class="footer">
+    v1.0.0 | Desenvolvido por Kevin Day | <a href="https://github.com/DKSource" target="_blank"> DKSource</a>
+</div>
+</body>
+</html>
