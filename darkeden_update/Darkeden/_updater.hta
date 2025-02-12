@@ -45,6 +45,7 @@
         }
         .config-item {
             margin: 10px 0;
+			
         }
         label {
             display: block;
@@ -58,7 +59,7 @@
             font-size: 14px;
             background-color: #200000;
             color: #fff;
-            border: 1px solid #c90000;
+         /*   border: 1px solid #c90000; */
         }
         input[type="checkbox"] {
             width: auto;
@@ -83,7 +84,6 @@
         .image-container img {
             max-width: 100%;
             height: auto;
-            border: 1px solid #c90000;
         }
         .log-container {
             margin-top: 20px;
@@ -120,19 +120,30 @@
             color: #ff0000;
             font-size: 12px;
         }
-        .version {
-            position: fixed;
-            bottom: 5px;
-            right: 5px;
-            font-size: 10px;
-            color: #400000;
-        }
+		.footer {
+		position: fixed;
+		bottom: 5px;
+		right: 5px;
+		font-size: 10px;
+		color: #c90000;
+		text-align: right;
+		}
+
+		.footer a {
+		color: #c90000;
+		text-decoration: none;
+		}
+
+		.footer a:hover {
+		color: #ff0000;
+		}
+
     </style>
     <script language="VBScript">
         ' Configurações globais
         Dim GAME_ROOT, configFile
-        Const URL_UPDATE_LIST = "http://192.168.0.35/update/update.lst"
-        Const URL_BASE = "http://192.168.0.35/update/"
+        Const URL_UPDATE_LIST = "https://darkeden.com.br/update/update.lst"
+        Const URL_BASE = "https://darkeden.com.br/update/"
         
         ' Função para obter o diretório atual
         Function GetCurrentDirectory()
@@ -486,7 +497,7 @@
             LoadSettings
             
             ' Definir o tamanho da janela
-            window.resizeTo 540, 800
+            window.resizeTo 540, 775
             
             ' Focar o botão de jogar
             document.getElementById("playButton").focus()
@@ -542,7 +553,8 @@
             <div class="status" id="status">Aguardando ação...</div>
         </div>
         
-        <div class="version">v2.0.1</div>
-    </div>
+<div class="footer">
+    v2.0.1 | Desenvolvido por Kevin Day | <a href="https://github.com/DKSource" target="_blank"> DKSource</a>
+</div>
 </body>
 </html>
