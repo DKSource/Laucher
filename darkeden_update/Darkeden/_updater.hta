@@ -9,7 +9,7 @@
         SINGLEINSTANCE="yes"
         WINDOWSTATE="normal"
         SHOWINTASKBAR="yes"
-        ICON="dklegend.exe"
+        ICON="darkeden.exe"
         SYSMENU="yes"
         MAXIMIZEBUTTON="no"
         MINIMIZEBUTTON="yes"
@@ -18,34 +18,128 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #000000;
+            background-color: #1a1a1a;
             color: #e0e0e0;
-            text-align: center;
+            font-size: 16px;
             margin: 0;
-            padding: 10px;
-            width: 500px;
-            height: 700px;
+            padding: 0;
+            overflow: hidden;
         }
         .container {
             background-color: #0a0a0a;
-            border: 2px solid #c90000;
+            border: 2px solid #8b0000;
+            width: 580px;
+            height: 350px;
+            margin: 10px auto;
             padding: 10px;
-            width: 480px;
-            height: 680px;
-            box-shadow: 0 0 10px #c90000;
+            box-sizing: border-box;
+        }
+        .main-table {
+            width: 100%;
+            height: 320px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .left-panel {
+            width: 50%;
+            vertical-align: top;
+            text-align: center;
+            padding-right: 10px;
+        }
+        .image-container {
+            margin-top: 10px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-container img {
+            max-width: 280px;
+            max-height: 180px;
+            border: 1px solid #8b0000;
+            object-fit: contain;
+        }
+        .log-section {
+            border: 1px solid #400000;
+            padding: 8px;
+            background-color: #0a0a0a;
+            margin-top: 5px;
+            height: 173px;
+        }
+        .log {
+            height: 100px;
+            overflow: auto;
+            background-color: #000000;
+            border: 1px solid #400000;
+            padding: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            color: #ff9999;
+            text-align: left;
+            scrollbar-face-color: #400000;
+            scrollbar-track-color: #0a0a0a;
+            scrollbar-arrow-color: #8b0000;
+            scrollbar-3dlight-color: #8b0000;
+            scrollbar-darkshadow-color: #000000;
+            scrollbar-shadow-color: #400000;
+            scrollbar-highlight-color: #600000;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 16px;
+            background-color: #200000;
+            border: 1px solid #8b0000;
+            margin-top: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #8b0000;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: left;
+            color: #fff;
+            font-size: 10px;
+            top: 2px;
+            z-index: 1;
+        }
+        .status {
+            margin-top: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status.success { color: #00cc00; }
+        .status.error { color: #ff3333; }
+        .status.waiting { color: #ff9999; }
+        .right-panel {
+            width: 50%;
+            vertical-align: top;
+            padding-left: 10px;
         }
         h1 {
-            color: #ff0000;
-            margin: 10px 0;
-            font-size: 24px;
-            text-shadow: 0 0 5px #c90000;
+            color: #8b0000;
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
         }
-        .config-menu {
-            margin-top: 10px;
+        .config-section {
+            border: 1px solid #400000;
+            padding: 10px;
+            background-color: #141414;
+            height: 270px; 
         }
         .config-item {
-            margin: 10px 0;
-			
+            margin: 15px 0;
+            text-align: left;
         }
         label {
             display: block;
@@ -53,99 +147,115 @@
             font-size: 14px;
             color: #ff9999;
         }
-        select, input[type="checkbox"] {
+        select {
             width: 100%;
-            padding: 5px;
+            padding: 6px;
             font-size: 14px;
             background-color: #200000;
             color: #fff;
-         /*   border: 1px solid #c90000; */
+            border: 1px solid #8b0000;
+            box-sizing: border-box;
         }
         input[type="checkbox"] {
-            width: auto;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .play-button {
+            text-align: center;
+            margin-top: 50px;
         }
         button {
-            width: 200px;
-            margin: 20px auto 0;
+            width: 140px;
             padding: 8px;
-            background-color: #200000;
-            border: 1px solid #c90000;
-            color: #ff0000;
-            font-size: 16px;
+            background-color: #400000;
+            border: 2px solid #8b0000;
+            color: #ff9999;
+            font-size: 14px;
             cursor: pointer;
             font-weight: bold;
         }
         button:hover {
-            background-color: #400000;
+            background-color: #600000;
         }
-        .image-container {
-            margin-bottom: 10px;
+        button:disabled {
+            background-color: #2a0000;
+            border-color: #4a0000;
+            color: #8a5050;
+            cursor: not-allowed;
         }
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-        }
-        .log-container {
-            margin-top: 20px;
-            border: 1px solid #400000;
-            padding: 10px;
-            background-color: #0a0a0a;
-        }
-        .log {
-            height: 150px;
-            overflow-y: auto;
-            background-color: #000000;
-            border: 1px solid #400000;
-            padding: 10px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 12px;
-            color: #ff0000;
-            text-align: left;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #200000;
-            border: 1px solid #c90000;
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #8b0000;
             margin-top: 10px;
         }
-        .progress {
-            width: 0%;
-            height: 100%;
-            background-color: #c90000;
-            transition: width 0.3s;
+        .footer a {
+            color: #8b0000;
+            text-decoration: none;
         }
-        .status {
-            margin-top: 10px;
-            color: #ff0000;
-            font-size: 12px;
+        .footer a:hover {
+            color: #ff3333;
         }
-		.footer {
-		position: fixed;
-		bottom: 5px;
-		right: 5px;
-		font-size: 10px;
-		color: #c90000;
-		text-align: right;
-		}
-
-		.footer a {
-		color: #c90000;
-		text-decoration: none;
-		}
-
-		.footer a:hover {
-		color: #ff0000;
-		}
-
     </style>
     <script language="VBScript">
         ' Configurações globais
-        Dim GAME_ROOT, configFile
+        Dim GAME_ROOT : GAME_ROOT = ""
+        Dim configFile : configFile = ""
         Const URL_UPDATE_LIST = "https://darkeden.com.br/update/update.lst"
         Const URL_BASE = "https://darkeden.com.br/update/"
         
-        ' Função para obter o diretório atual
+        ' Função para calcular o hash MD5 de um arquivo local
+        Function CalculateMD5(filePath)
+            On Error Resume Next
+            Dim shell, cmd, output
+            Set shell = CreateObject("WScript.Shell")
+            cmd = "certutil -hashfile """ & filePath & """ MD5"
+            Set output = shell.Exec(cmd)
+            Dim hash
+            hash = output.StdOut.ReadLine() ' Primeira linha é cabeçalho
+            hash = output.StdOut.ReadLine() ' Segunda linha contém o hash
+            CalculateMD5 = Trim(hash)
+            Set shell = Nothing
+            If Err.Number <> 0 Then
+                CalculateMD5 = ""
+            End If
+            On Error GoTo 0
+        End Function
+
+        ' Função para verificar se o arquivo precisa ser atualizado
+        Function NeedsUpdate(localFile, expectedHash)
+            Dim fso
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            If Not fso.FileExists(localFile) Then
+                NeedsUpdate = True
+                Exit Function
+            End If
+            Dim localHash
+            localHash = CalculateMD5(localFile)
+            If localHash = expectedHash Then
+                NeedsUpdate = False
+            Else
+                NeedsUpdate = True
+            End If
+            Set fso = Nothing
+        End Function
+
+        ' Função para baixar o arquivo apenas se necessário
+        Sub DownloadIfNeeded(url, destFile, expectedHash)
+            Dim localFile
+            localFile = destFile
+            If NeedsUpdate(localFile, expectedHash) Then
+                If DownloadFile(url, destFile) Then
+                    LogMessage "Arquivo atualizado: " & destFile
+                Else
+                    LogMessage "Falha ao atualizar: " & destFile
+                End If
+            Else
+                LogMessage "Arquivo já está atualizado: " & destFile
+            End If
+        End Sub
+
+        ' Funções existentes mantidas
         Function GetCurrentDirectory()
             Dim fso, scriptPath
             Set fso = CreateObject("Scripting.FileSystemObject")
@@ -154,22 +264,22 @@
             scriptPath = Replace(scriptPath, "/", "\")
             scriptPath = Replace(scriptPath, "%20", " ")
             GetCurrentDirectory = fso.GetParentFolderName(scriptPath)
+            Set fso = Nothing
         End Function
 
-        ' Funções de configuração
         Sub EnsureDirectoryExists(path)
             Dim fso
             Set fso = CreateObject("Scripting.FileSystemObject")
             If Not fso.FolderExists(path) Then
                 fso.CreateFolder(path)
             End If
+            Set fso = Nothing
         End Sub
 
         Function ReadConfig(filePath)
             On Error Resume Next
             Dim fso, file, contents
             Set fso = CreateObject("Scripting.FileSystemObject")
-            
             If fso.FileExists(filePath) Then
                 Set file = fso.OpenTextFile(filePath, 1)
                 If Err.Number = 0 Then
@@ -184,20 +294,19 @@
                 ReadConfig = ""
             End If
             On Error GoTo 0
+            Set fso = Nothing
         End Function
 
         Sub WriteConfig(filePath, contents)
             On Error Resume Next
             Dim fso, file
             Set fso = CreateObject("Scripting.FileSystemObject")
-            
             If fso.FileExists(filePath) Then
                 Set file = fso.GetFile(filePath)
                 If file.Attributes And 1 Then
                     file.Attributes = file.Attributes - 1
                 End If
             End If
-            
             Set file = fso.OpenTextFile(filePath, 2, True)
             If Err.Number = 0 Then
                 file.Write contents
@@ -206,51 +315,54 @@
                 LogMessage "Erro ao salvar configuração: " & Err.Description
             End If
             On Error GoTo 0
+            Set fso = Nothing
         End Sub
 
         Sub UpdateConfig(filePath, setting, newValue)
             Dim config, lines, i, newConfig
-            
             config = ReadConfig(filePath)
             If config = "" Then
-                config = "ResolutionX: 800" & vbCrLf & "ResolutionY: 600" & vbCrLf & "FullScreen: 0"
+                config = "ResolutionX: 1280" & vbCrLf & "ResolutionY: 720" & vbCrLf & "FullScreen: 0"
             End If
-            
             lines = Split(config, vbCrLf)
             For i = 0 To UBound(lines)
                 If InStr(lines(i), setting & ":") > 0 Then
                     lines(i) = setting & ": " & newValue
                 End If
             Next
-            
             newConfig = Join(lines, vbCrLf)
             WriteConfig filePath, newConfig
         End Sub
 
-        ' Funções de log e progresso
         Sub LogMessage(msg)
-            Dim logDiv, currentTime
+            Dim logDiv, currentTime, statusDiv
             currentTime = Time()
             Set logDiv = document.getElementById("log")
+            Set statusDiv = document.getElementById("status")
             logDiv.innerHTML = logDiv.innerHTML & "[" & currentTime & "] " & msg & "<br>"
             logDiv.scrollTop = logDiv.scrollHeight
-            document.getElementById("status").innerHTML = msg
+            statusDiv.innerHTML = msg
+            If InStr(msg, "Erro") > 0 Then
+                statusDiv.className = "status error"
+            ElseIf InStr(msg, "concluído") > 0 Then
+                statusDiv.className = "status success"
+            Else
+                statusDiv.className = "status waiting"
+            End If
         End Sub
 
         Sub UpdateProgress(percent)
             document.getElementById("progress").style.width = percent & "%"
+            document.getElementById("progress-text").innerHTML = percent & "%"
         End Sub
 
-        ' Funções de atualização
         Function DownloadFile(url, destFile)
             On Error Resume Next
             LogMessage "Iniciando download: " & url
-            
             Dim xhr, stream
             Set xhr = CreateObject("MSXML2.XMLHTTP")
             xhr.Open "GET", url, False
             xhr.Send
-
             If xhr.Status = 200 Then
                 Set stream = CreateObject("ADODB.Stream")
                 stream.Type = 1
@@ -264,7 +376,6 @@
                 LogMessage "Erro ao baixar: " & url & " (Status: " & xhr.Status & ")"
                 DownloadFile = False
             End If
-            
             Set stream = Nothing
             Set xhr = Nothing
             On Error GoTo 0
@@ -274,10 +385,8 @@
             On Error Resume Next
             Dim fso, parts, currentPath, i
             Set fso = CreateObject("Scripting.FileSystemObject")
-            
             parts = Split(path, "\")
             currentPath = ""
-            
             For i = 0 To UBound(parts)
                 If parts(i) <> "" Then
                     currentPath = currentPath & parts(i) & "\"
@@ -287,7 +396,6 @@
                     End If
                 End If
             Next
-            
             Set fso = Nothing
             On Error GoTo 0
         End Sub
@@ -306,100 +414,100 @@
             On Error Resume Next
             Dim fso, destPath, destFilePath
             Set fso = CreateObject("Scripting.FileSystemObject")
-            
             destPath = GAME_ROOT & "\" & FixPath(relativeDestination)
             CreateFolderRecursive destPath
-            
             destFilePath = destPath & "\" & fso.GetFileName(sourceFile)
-            
             If fso.FileExists(destFilePath) Then
                 fso.DeleteFile destFilePath, True
             End If
-            
             fso.MoveFile sourceFile, destFilePath
             LogMessage "Arquivo movido para: " & destFilePath
-            
             Set fso = Nothing
             On Error GoTo 0
         End Sub
 
-        ' Função principal de atualização
+        Sub CleanTempFolder()
+            On Error Resume Next
+            Dim fso
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            If fso.FolderExists(GAME_ROOT & "\temp") Then
+                fso.DeleteFolder GAME_ROOT & "\temp", True
+                LogMessage "Diretório temporário limpo."
+            End If
+            Set fso = Nothing
+            On Error GoTo 0
+        End Sub
+
         Sub UpdateGame()
             On Error Resume Next
             document.getElementById("playButton").disabled = True
+            document.getElementById("resolution").disabled = True
+            document.getElementById("fullscreen").disabled = True
+            document.getElementById("server").disabled = True
             LogMessage "Iniciando verificação de atualizações..."
             UpdateProgress(0)
-            
-            Dim fso, file, line, parts, url, dest, tempPath, totalFiles, currentFile
+            Dim fso, file, line, parts, url, dest, totalFiles, currentFile
             Set fso = CreateObject("Scripting.FileSystemObject")
-            
             If Not DownloadFile(URL_UPDATE_LIST, "update.lst") Then
                 LogMessage "Erro crítico ao baixar update.lst"
-                document.getElementById("playButton").disabled = False
+                EnableControls
                 Exit Sub
             End If
-            
             If fso.FileExists("update.lst") Then
                 Set file = fso.OpenTextFile("update.lst", 1)
-                
                 totalFiles = 0
                 currentFile = 0
-                
-                ' Contar total de arquivos
                 Do Until file.AtEndOfStream
                     line = Trim(file.ReadLine)
                     If Left(line, 2) = "v=" Then
                         totalFiles = totalFiles + 1
                     End If
                 Loop
-                
-                ' Voltar ao início do arquivo
                 file.Close
                 Set file = fso.OpenTextFile("update.lst", 1)
-                
                 Do Until file.AtEndOfStream
                     line = Trim(file.ReadLine)
                     If Left(line, 2) = "v=" Then
                         currentFile = currentFile + 1
                         UpdateProgress(Int((currentFile / totalFiles) * 100))
-                        
                         parts = Split(line, "|")
-                        Dim fileVersion, fileName, fileDir, fileHash
-                        fileVersion = Mid(parts(0), 3)
-                        fileName = Mid(parts(1), 3)
-                        fileDir = Mid(parts(2), 3)
-                        fileHash = Mid(parts(3), 3)
-                        
-                        url = URL_BASE & fileName
-                        dest = fileDir
-                        tempPath = GAME_ROOT & "\temp\" & fileName
-                        
-                        CreateFolderRecursive GAME_ROOT & "\temp"
-                        
-                        If DownloadFile(url, tempPath) Then
-                            MoveFile tempPath, dest
+                        If UBound(parts) < 3 Then
+                            LogMessage "Erro: Formato inválido na linha: " & line
+                        Else
+                            Dim fileVersion, fileName, fileDir, fileHash
+                            fileVersion = Mid(parts(0), 3)
+                            fileName = Mid(parts(1), 3)
+                            fileDir = Mid(parts(2), 3)
+                            fileHash = Mid(parts(3), 3)
+                            url = URL_BASE & fileName
+                            dest = GAME_ROOT & "\" & FixPath(fileDir) & "\" & fileName
+                            CreateFolderRecursive GAME_ROOT & "\" & FixPath(fileDir)
+                            DownloadIfNeeded url, dest, fileHash
                         End If
                     End If
                 Loop
-                
                 file.Close
-                LogMessage "Atualização concluída com sucesso!"
+                CleanTempFolder
+                LogMessage "Atualização concluída com sucesso! Clique em Jogar para iniciar."
                 UpdateProgress(100)
             Else
                 LogMessage "Erro: Arquivo update.lst não encontrado"
             End If
-            
             Set file = Nothing
             Set fso = Nothing
-            document.getElementById("playButton").disabled = False
-            StartGame
+            EnableControls
             On Error GoTo 0
         End Sub
 
-        ' Funções de inicialização e carregamento
-        Sub LoadSettings
+        Sub EnableControls()
+            document.getElementById("playButton").disabled = False
+            document.getElementById("resolution").disabled = False
+            document.getElementById("fullscreen").disabled = False
+            document.getElementById("server").disabled = False
+        End Sub
+
+        Sub LoadSettings()
             Dim config, lines, i, resolutionX, resolutionY, fullscreen
-            
             config = ReadConfig(configFile)
             If config = "" Then
                 resolutionX = "1280"
@@ -410,7 +518,6 @@
                 UpdateConfig configFile, "FullScreen", fullscreen
             Else
                 lines = Split(config, vbCrLf)
-                
                 For i = 0 To UBound(lines)
                     If InStr(lines(i), "ResolutionX:") > 0 Then
                         resolutionX = Trim(Split(lines(i), ":")(1))
@@ -423,58 +530,65 @@
                     End If
                 Next
             End If
-            
             document.getElementById("resolution").value = resolutionX & "x" & resolutionY
             document.getElementById("fullscreen").checked = (fullscreen = "1")
         End Sub
 
-        Sub LoadImage
-            Dim currentDir
+        Sub LoadImage()
+            Dim currentDir, fso, imgPath
+            Set fso = CreateObject("Scripting.FileSystemObject")
             currentDir = GetCurrentDirectory()
-            document.getElementById("gameImage").src = currentDir & "\Data\image\darkeden.png"
+            imgPath = currentDir & "\Data\image\darkeden.png"
+            If fso.FileExists(imgPath) Then
+                document.getElementById("gameImage").src = imgPath
+            Else
+                LogMessage "Erro: Imagem darkeden.png não encontrada!"
+            End If
+            Set fso = Nothing
         End Sub
 
-        ' Função para iniciar o jogo
-        Sub StartGame
-            Dim resX, resY, fullscreen, server, command
-            
+        Sub StartGame()
+            On Error Resume Next
+            Dim resX, resY, fullscreen, server, command, parts
             resX = document.getElementById("resolution").value
-            resY = Split(resX, "x")(1)
-            resX = Split(resX, "x")(0)
-            
+            parts = Split(resX, "x")
+            If UBound(parts) <> 1 Then
+                LogMessage "Erro: Resolução inválida!"
+                Exit Sub
+            Else
+                resX = parts(0)
+                resY = parts(1)
+            End If
             If document.getElementById("fullscreen").checked Then
                 fullscreen = 1
             Else
                 fullscreen = 0
             End If
-            
             UpdateConfig configFile, "ResolutionX", resX
             UpdateConfig configFile, "ResolutionY", resY
             UpdateConfig configFile, "FullScreen", fullscreen
-
             server = document.getElementById("server").value
             Select Case server
-                Case "offline"
-                    command = "dklegend.exe NEWSTART Futec(192.168.0.35:9909)"
-                Case "darkeden.com.br"
+                Case "server1"
+                    command = "darkeden.exe NEWSTART Futec(192.168.0.35:9909)"
+                Case "server2"
                     command = "darkeden.exe NEWSTART Futec(207.244.89.166:9909)"
-                Case "darkeden_legend"
-                    command = "dklegend.exe NEWSTART Futec(144.217.10.52:53303)"
-                Case "darkeden_test"
+                Case "server3"
+                    command = "darkeden.exe NEWSTART Futec(144.217.10.52:53303)"
+                Case "server4"
                     command = "darkeden.exe NEWSTART Futec(192.168.0.130:9909)"
             End Select
-            
             Dim shell
             Set shell = CreateObject("WScript.Shell")
             shell.CurrentDirectory = GAME_ROOT
             shell.Run command, 1, False
-            
             LogMessage "Jogo iniciado com sucesso!"
+            Set shell = Nothing
+            On Error GoTo 0
         End Sub
 
-        ' Tratamento do botão Enter
         Sub HandleKeyPress()
-            If window.event.keyCode = 13 Then ' 13 é o código da tecla Enter
+            If window.event.keyCode = 13 Then
                 Dim playButton
                 Set playButton = document.getElementById("playButton")
                 If Not playButton.disabled Then
@@ -483,78 +597,78 @@
             End If
         End Sub
 
-        ' Função que combina atualização e início do jogo
         Sub PlayAndUpdate()
             UpdateGame
+            StartGame
         End Sub
 
-        ' Inicialização
-        Sub Window_OnLoad
+        Sub Window_OnLoad()
             GAME_ROOT = GetCurrentDirectory()
             configFile = GAME_ROOT & "\Data\Info\Resolution.inf"
             EnsureDirectoryExists(GAME_ROOT & "\Data\Info")
             LoadImage
             LoadSettings
-            
-            ' Definir o tamanho da janela
-            window.resizeTo 540, 775
-            
-            ' Focar o botão de jogar
+            window.resizeTo 640, 435
             document.getElementById("playButton").focus()
-            
             LogMessage "Launcher iniciado. Pronto para jogar!"
         End Sub
     </script>
 </head>
-<body onkeypress="HandleKeyPress">
+<body onkeypress="HandleKeyPress" onload="Window_OnLoad">
     <div class="container">
-        <h1>DarkEden Launcher</h1>
-        <div class="image-container">
-            <img id="gameImage" src="" alt="DarkEden">
+        <table class="main-table">
+            <tr>
+                <td class="left-panel">
+                    <div class="image-container">
+                        <img id="gameImage" src="" alt="DarkEden">
+                    </div>
+                    <div class="log-section">
+                        <div class="log" id="log"></div>
+                        <div class="progress-bar">
+                            <div class="progress" id="progress"></div>
+                            <span class="progress-text" id="progress-text">0%</span>
+                        </div>
+                        <div class="status waiting" id="status">Aguardando ação...</div>
+                    </div>
+                </td>
+                <td class="right-panel">
+                    <h1>DarkEden Launcher</h1>
+                    <div class="config-section">
+                        <div class="config-item">
+                            <label for="resolution">Resolução:</label>
+                            <select id="resolution" tabindex="1" title="Escolha a resolução da tela">
+                                <option value="800x600">800x600</option>
+                                <option value="1024x768">1024x768</option>
+                                <option value="1280x720">1280x720</option>
+                                <option value="1280x800">1280x800</option>
+                                <option value="1366x768">1366x768</option>
+                                <option value="1440x900">1440x900</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="server">Servidor:</label>
+                            <select id="server" tabindex="2" title="Escolha o servidor para conectar">
+                                <option value="server1" title="Modo offline para teste">Offline</option>
+                                <option value="server2" title="Servidor oficial">darkeden.com.br</option>
+                                <option value="server3" title="Servidor de desenvolvimento">DarkEden Dev</option>
+                                <option value="server4" title="Servidor de testes">DarkEden Test</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="fullscreen">
+                                <input type="checkbox" id="fullscreen" tabindex="3" title="Alternar modo tela cheia"> Tela Cheia
+                            </label>
+                        </div>
+                        <div class="play-button">
+                            <button id="playButton" tabindex="4" onclick="PlayAndUpdate">Jogar</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="footer">
+            v2.0.3 | Desenvolvido por Kevin Day | <a href="https://github.com/DKSource" target="_blank">DKSource</a>
         </div>
-        
-        <div class="config-menu">
-            <div class="config-item">
-                <label for="resolution">Resolução:</label>
-                <select id="resolution">
-                    <option value="800x600">800x600</option>
-                    <option value="1024x768">1024x768</option>
-                    <option value="1280x720">1280x720</option>
-                    <option value="1280x800">1280x800</option>
-                    <option value="1366x768">1366x768</option>
-                    <option value="1440x900">1440x900</option>
-                </select>
-            </div>
-            <div class="config-item">
-                <label for="fullscreen">
-                    <input type="checkbox" id="fullscreen">
-                    Tela Cheia
-                </label>
-            </div>
-            
-            <div class="config-item">
-                <label for="server">Selecione o servidor:</label>
-                <select id="server">
-                    <option value="offline">Offline</option>
-                    <option value="darkeden.com.br">darkeden.com.br</option>
-                    <option value="darkeden_legend">darkeden_legend</option>
-                    <option value="darkeden_test">darkeden_vmware</option>
-                </select>
-            </div>
-            
-            <button id="playButton" onclick="PlayAndUpdate">Jogar</button>
-        </div>
-
-        <div class="log-container">
-            <div class="log" id="log"></div>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
-            </div>
-            <div class="status" id="status">Aguardando ação...</div>
-        </div>
-        
-<div class="footer">
-    v2.0.1 | Desenvolvido por Kevin Day | <a href="https://github.com/DKSource" target="_blank"> DKSource</a>
-</div>
+    </div>
 </body>
 </html>
